@@ -547,6 +547,83 @@
         // Inicia a busca logo ao carregar a página
         fetchHealthData();
 
+        // ==========================================
+        // LÓGICA DO MODAL DE REGISTRO
+        // ==========================================
+        function openAddModal() {
+            const modal = document.getElementById('addModal');
+            const modalContent = document.getElementById('addModalContent');
+            
+            // Define a data de hoje como padrão
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('input-date').value = today;
+            
+            modal.classList.remove('hidden');
+            // Pequeno delay para a animação de entrada funcionar
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeAddModal() {
+            const modal = document.getElementById('addModal');
+            const modalContent = document.getElementById('addModalContent');
+            
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('healthForm').reset();
+            }, 200);
+        }
+
+        async function saveHealthData(event) {
+            event.preventDefault(); // Evita que a página recarregue
+            
+            const btnSave = document.getElementById('btn-save');
+            const originalText = btnSave.innerHTML;
+            btnSave.innerHTML = '<i class="ph ph-spinner animate-spin text-lg"></i> Salvando...';
+            btnSave.disabled = true;
+
+            const newData = {
+                data: document.getElementById('input-date').value,
+                peso: parseFloat(document.getElementById('input-weight').value),
+                passos: parseInt(document.getElementById('input-steps').value),
+                horas_sono: parseFloat(document.getElementById('input-sleep').value)
+            };
+
+            try {
+                // Insere os dados no Supabase
+                const { error } = await supabaseClient
+                    .from('health_metrics')
+                    .insert([newData]);
+
+                if (error) throw error;
+
+                // Sucesso!
+                closeAddModal();
+                
+                // Recarrega os dados para atualizar a tela e os gráficos
+                await fetchHealthData();
+                btnSave.innerHTML = originalText;
+                btnSave.disabled = false;
+                
+            } catch (error) {
+                console.error("Erro ao salvar:", error);
+                btnSave.innerHTML = '<i class="ph ph-warning-circle text-lg"></i> Erro ao Salvar';
+                btnSave.classList.replace('bg-primary', 'bg-red-500');
+                
+                // Volta o botão ao normal após 3 segundos
+                setTimeout(() => {
+                    btnSave.innerHTML = originalText;
+                    btnSave.classList.replace('bg-red-500', 'bg-primary');
+                    btnSave.disabled = false;
+                }, 3000);
+            }
+        }
+
         function switchScreen(screenName) {
             document.querySelectorAll('main > section').forEach(section => {
                 section.classList.remove('block', 'screen-enter');
