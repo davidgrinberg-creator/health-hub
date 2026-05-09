@@ -19,6 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Phosphor Icons para ícones modernos -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Supabase SDK (Banco de Dados) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -107,11 +109,11 @@
     <header class="pt-10 pb-4 px-6 bg-cardLight dark:bg-cardDark shadow-sm z-10 sticky top-0 flex justify-between items-center transition-colors duration-300">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-blue-500 p-[2px]">
-                <img src="https://ui-avatars.com/api/?name=Alexandre&background=random&color=fff" alt="Perfil" class="rounded-full w-full h-full border-2 border-white dark:border-cardDark object-cover">
+                <img src="https://ui-avatars.com/api/?name=David+Grinberg&background=random&color=fff" alt="Perfil" class="rounded-full w-full h-full border-2 border-white dark:border-cardDark object-cover">
             </div>
             <div>
                 <p class="text-xs text-textSubLight dark:text-textSubDark font-medium">Bem-vindo,</p>
-                <h1 class="text-lg font-bold leading-tight">Alexandre</h1>
+                <h1 class="text-lg font-bold leading-tight">David Grinberg</h1>
             </div>
         </div>
         <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -471,57 +473,64 @@
     </nav>
 
     <script>
-        // Lógica de Alternância de Tela
+        // ==========================================
+        // CONFIGURAÇÃO DO BANCO DE DADOS (SUPABASE)
+        // ==========================================
+        
+        // Suas chaves já estão configuradas aqui!
+        const supabaseUrl = 'https://kwwahyzjmbziyanbpobv.supabase.co/rest/v1/';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3d2FoeXpqbWJ6aXlhbmJwb2J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjg0ODMsImV4cCI6MjA5Mzg0NDQ4M30.yrnKNBndXV4yp2XSdzeTJAychpDOmlln-I2VNPdB5gw';
+        
+        let supabaseClient;
+        if (supabaseUrl !== 'COLE_A_SUA_PROJECT_URL_AQUI') {
+            supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log("Conectado ao Supabase com sucesso!");
+        }
+
+        // ==========================================
+        // LÓGICA DA INTERFACE DO APLICATIVO
+        // ==========================================
+
         function switchScreen(screenName) {
-            // Esconde todas as telas
             document.querySelectorAll('main > section').forEach(section => {
                 section.classList.remove('block', 'screen-enter');
                 section.classList.add('hidden');
             });
-
-            // Remove 'active' de todos os botões de navegação
             document.querySelectorAll('.nav-item').forEach(nav => {
                 nav.classList.remove('active');
             });
 
-            // Mostra a tela selecionada
             const targetScreen = document.getElementById(`screen-${screenName}`);
             if (targetScreen) {
                 targetScreen.classList.remove('hidden');
                 targetScreen.classList.add('block', 'screen-enter');
             }
 
-            // Ativa o botão selecionado
             const targetNav = document.getElementById(`nav-${screenName}`);
             if (targetNav) {
                 targetNav.classList.add('active');
             }
 
-            // Inicializa ou atualiza gráficos se for a aba de evolução
             if (screenName === 'evolution' && !window.chartsInitialized) {
                 initCharts();
                 window.chartsInitialized = true;
             }
         }
 
-        // Lógica de Tema Dark/Light
         const themeToggleBtn = document.getElementById('themeToggle');
         const htmlElement = document.documentElement;
         
-        // Verifica preferência do sistema
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             htmlElement.classList.add('dark');
         }
 
         themeToggleBtn.addEventListener('click', () => {
             htmlElement.classList.toggle('dark');
-            // Atualiza os gráficos se estiverem abertos para pegar a nova cor do texto
             if (window.chartsInitialized) {
-                initCharts(); // Recria os gráficos com as cores corretas
+                initCharts(); 
             }
         });
 
-        // Configuração do Chart.js
         let weightChartInstance = null;
         let vo2ChartInstance = null;
 
@@ -530,7 +539,6 @@
             const gridColor = isDark ? '#374151' : '#e5e7eb';
             const textColor = isDark ? '#9ca3af' : '#6b7280';
 
-            // Dados Fictícios de Peso
             const weightCtx = document.getElementById('weightChart').getContext('2d');
             if (weightChartInstance) weightChartInstance.destroy();
             
@@ -541,7 +549,7 @@
                     datasets: [{
                         label: 'Peso (kg)',
                         data: [80.6, 80.2, 79.5, 79.0, 78.8, 78.5],
-                        borderColor: '#10b981', // Emerald 500
+                        borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 3,
                         pointBackgroundColor: '#fff',
@@ -569,7 +577,6 @@
                 }
             });
 
-            // Dados Fictícios de VO2 Max
             const vo2Ctx = document.getElementById('vo2Chart').getContext('2d');
             if (vo2ChartInstance) vo2ChartInstance.destroy();
             
@@ -580,7 +587,7 @@
                     datasets: [{
                         label: 'VO2 Max',
                         data: [46, 46, 47, 47, 48, 48],
-                        backgroundColor: '#3b82f6', // Blue 500
+                        backgroundColor: '#3b82f6',
                         borderRadius: 6,
                         barPercentage: 0.5
                     }]
@@ -604,7 +611,6 @@
             });
         }
 
-        // PWA Setup e Lógica de Instalação
         const manifest = {
             "name": "Health Hub",
             "short_name": "HealthHub",
@@ -633,10 +639,7 @@
         const swBlob = new Blob([swCode], {type: 'text/javascript'});
         
         if ('serviceWorker' in navigator) {
-            // Registra um Service Worker virtual para ativar a instalação
-            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {
-                console.log('Ambiente de visualização restrito, mas tags de PWA estão ativas.');
-            });
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
         }
 
         let deferredPrompt;
@@ -660,12 +663,11 @@
                     deferredPrompt = null;
                 });
             } else {
-                // Alerta nativo adaptado para iOS, já que a Apple não suporta o botão de instalação nativo via JS
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 if(isIOS) {
                     alert('Para instalar no iOS (iPhone):\n1. Toque no ícone de "Compartilhar" (quadrado com seta para cima) na barra do Safari.\n2. Role para baixo e selecione "Adicionar à Tela de Início".');
                 } else {
-                    alert('Seu navegador não suporta a instalação automática. Acesse as opções do navegador e clique em "Instalar aplicativo" ou "Adicionar à tela inicial".');
+                    alert('Seu navegador não suporta a instalação automática. Acesse as opções do navegador e clique em "Instalar aplicativo".');
                 }
             }
         }
