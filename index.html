@@ -5,69 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Health Hub</title>
     
-    <!-- PWA Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Health Hub">
+    <!-- PWA / Manifest -->
     <meta name="theme-color" content="#10b981">
-    <link rel="apple-touch-icon" href="https://api.iconify.design/ph/heartbeat-fill.svg?color=%2310b981&width=192&height=192">
-    <link id="pwa-manifest" rel="manifest" href="">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Health%20Hub%22,%22short_name%22:%22HealthHub%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22#f3f4f6%22,%22theme_color%22:%22#10b981%22,%22icons%22:[{%22src%22:%22https://placehold.co/512x512/10b981/white?text=HH%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js para gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Phosphor Icons para ícones modernos -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Supabase SDK (Banco de Dados) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Configuração de Cores do Tailwind -->
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
+                    colors: {
+                        primary: '#10b981', // Verde Esmeralda
+                        primaryDark: '#059669',
+                        bgLight: '#f9fafb',
+                    },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#10b981', // Emerald 500
-                        primaryDark: '#059669', // Emerald 600
-                        bgLight: '#f3f4f6', // Gray 100
-                        bgDark: '#111827', // Gray 900
-                        cardLight: '#ffffff',
-                        cardDark: '#1f2937', // Gray 800
-                        textMainLight: '#111827',
-                        textSubLight: '#6b7280',
-                        textMainDark: '#f9fafb',
-                        textSubDark: '#9ca3af',
                     }
                 }
             }
         }
     </script>
+
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Chart.js para Gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
             -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-            background-color: #f3f4f6;
         }
         
-        .dark body {
-            background-color: #111827;
-            color: #f9fafb;
-        }
-
-        /* Ocultar barra de rolagem mas manter funcionalidade */
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
-
-        /* Animações de transição de tela */
         .screen-enter {
             animation: fadeIn 0.3s ease-out forwards;
         }
@@ -77,667 +56,337 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Estilo do Bottom Navigation */
-        .nav-item.active {
-            color: #10b981;
-        }
-        .nav-item.active i {
-            font-weight: 700;
-        }
-
-        /* Linha do tempo dos exames */
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 0.45rem;
-            top: 2rem;
-            bottom: -1rem;
-            width: 2px;
-            background-color: #e5e7eb;
-        }
-        .dark .timeline-item::before {
-            background-color: #374151;
-        }
-        .timeline-item:last-child::before {
-            display: none;
+        /* Ocultar barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
     </style>
 </head>
-<body class="bg-bgLight text-textMainLight dark:bg-bgDark dark:text-textMainDark h-screen flex flex-col transition-colors duration-300">
+<body class="text-gray-800 antialiased pb-24">
 
-    <!-- App Header -->
-    <header class="pt-10 pb-4 px-6 bg-cardLight dark:bg-cardDark shadow-sm z-10 sticky top-0 flex justify-between items-center transition-colors duration-300">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-blue-500 p-[2px]">
-                <img src="https://ui-avatars.com/api/?name=David+Grinberg&background=random&color=fff" alt="Perfil" class="rounded-full w-full h-full border-2 border-white dark:border-cardDark object-cover">
+    <!-- HEADER -->
+    <header class="bg-white px-6 pt-12 pb-4 rounded-b-[2rem] shadow-sm sticky top-0 z-20">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="https://ui-avatars.com/api/?name=David+Grinberg&background=10b981&color=fff&rounded=true&bold=true" alt="Perfil" class="w-12 h-12 rounded-full shadow-md">
+                <div>
+                    <p class="text-xs text-gray-500 font-medium">Bom dia,</p>
+                    <h1 class="text-xl font-bold text-gray-900">David Grinberg</h1>
+                </div>
             </div>
-            <div>
-                <p class="text-xs text-textSubLight dark:text-textSubDark font-medium">Bem-vindo,</p>
-                <h1 class="text-lg font-bold leading-tight">David Grinberg</h1>
-            </div>
+            <button class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
+                <i class="ph ph-bell text-xl"></i>
+            </button>
         </div>
-        <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <i class="ph ph-moon text-xl dark:hidden"></i>
-            <i class="ph ph-sun text-xl hidden dark:block text-yellow-400"></i>
-        </button>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto pb-24 relative" id="mainContainer">
-        
+    <!-- MAIN CONTENT -->
+    <main id="app-content">
         <!-- SCREEN 1: DASHBOARD -->
         <section id="screen-dashboard" class="p-6 space-y-6 block screen-enter">
             
             <!-- Botão Registrar Hoje -->
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-2xl font-bold">Visão Geral</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Visão Geral</h2>
                 <button onclick="openAddModal()" class="bg-primary text-white px-4 py-2 rounded-full shadow-md hover:bg-primaryDark transition-colors font-bold text-sm flex items-center gap-2">
                     <i class="ph ph-plus font-bold text-lg"></i> Registrar
                 </button>
             </div>
 
-            <!-- PWA Install Banner -->
-            <div id="pwa-banner" class="hidden items-center justify-between bg-gradient-to-r from-primary to-blue-500 text-white p-4 rounded-2xl shadow-lg transition-all">
+            <!-- CARD DE INTEGRAÇÃO STRAVA -->
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 mb-6 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <i class="ph ph-download-simple text-2xl"></i>
+                    <div class="w-10 h-10 rounded-full bg-[#FC4C02]/10 flex items-center justify-center text-[#FC4C02]">
+                        <i class="ph ph-activity text-xl font-bold"></i>
+                    </div>
                     <div>
-                        <p class="font-bold text-sm">Instalar Aplicativo</p>
-                        <p class="text-xs opacity-90">Acesse rápido da tela inicial</p>
+                        <h3 class="font-bold text-gray-800">Strava / Garmin</h3>
+                        <p class="text-xs text-gray-500">Sincronizar treinos</p>
                     </div>
                 </div>
-                <button onclick="installPWA()" class="bg-white text-primary text-xs font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-gray-100 transition-colors">
-                    Instalar
+                <button id="strava-btn" onclick="connectStrava()" class="bg-[#FC4C02] text-white px-4 py-2 rounded-full font-bold text-xs shadow-md transition-colors">
+                    Conectar
                 </button>
             </div>
 
-            <!-- Resumo Rápido -->
+            <!-- KEY METRICS GRID -->
             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center transition-colors">
-                    <i class="ph ph-heartbeat text-3xl text-red-500 mb-2"></i>
-                    <p class="text-sm text-textSubLight dark:text-textSubDark">Freq. Repouso</p>
-                    <p class="text-xl font-bold">58 <span class="text-xs font-normal">bpm</span></p>
-                </div>
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center transition-colors">
-                    <i class="ph ph-moon-stars text-3xl text-indigo-500 mb-2"></i>
-                    <p class="text-sm text-textSubLight dark:text-textSubDark">Sono</p>
-                    <p id="dash-sleep" class="text-xl font-bold">--</p>
-                </div>
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center transition-colors">
-                    <i class="ph ph-flame text-3xl text-orange-500 mb-2"></i>
-                    <p class="text-sm text-textSubLight dark:text-textSubDark">Calorias Ativas</p>
-                    <p class="text-xl font-bold">840 <span class="text-xs font-normal">kcal</span></p>
-                </div>
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center transition-colors">
-                    <i class="ph ph-person-simple-run text-3xl text-primary mb-2"></i>
-                    <p class="text-sm text-textSubLight dark:text-textSubDark">Passos</p>
-                    <p id="dash-steps" class="text-xl font-bold">--</p>
-                </div>
-            </div>
-
-            <!-- Última Atividade -->
-            <div>
-                <h2 class="text-lg font-bold mb-3 flex items-center justify-between">
-                    Última Atividade
-                    <span class="text-xs text-primary font-medium">Sincronizado há 1h</span>
-                </h2>
-                <div class="bg-gradient-to-r from-cardLight to-gray-50 dark:from-cardDark dark:to-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-2">
-                            <div class="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg">
-                                <i class="ph-fill ph-sneaker text-orange-500 text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold">Corrida Matinal</h3>
-                                <p class="text-xs text-textSubLight dark:text-textSubDark">Hoje, 06:30 • via Strava</p>
-                            </div>
+                <!-- Passos -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 flex flex-col justify-between h-32">
+                    <div class="flex justify-between items-start">
+                        <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
+                            <i class="ph ph-sneaker text-lg"></i>
                         </div>
+                        <span class="text-xs font-semibold text-green-500 bg-green-50 px-2 py-1 rounded-full">Hoje</span>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <div>
-                            <p class="text-xs text-textSubLight dark:text-textSubDark">Distância</p>
-                            <p class="font-bold text-sm">8.5 km</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-textSubLight dark:text-textSubDark">Ritmo Médio</p>
-                            <p class="font-bold text-sm">5:15 /km</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-textSubLight dark:text-textSubDark">Tempo</p>
-                            <p class="font-bold text-sm">44:37</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Próximo Exame -->
-             <div>
-                <h2 class="text-lg font-bold mb-3">Atenção Necessária</h2>
-                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-800 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-blue-100 dark:bg-blue-800 p-2 rounded-full text-blue-600 dark:text-blue-300">
-                            <i class="ph ph-syringe text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="font-bold text-sm text-blue-900 dark:text-blue-100">Exame de Sangue Anual</p>
-                            <p class="text-xs text-blue-700 dark:text-blue-300">Agendado para 15/Maio</p>
-                        </div>
-                    </div>
-                    <i class="ph ph-caret-right text-blue-500"></i>
-                </div>
-            </div>
-        </section>
-
-        <!-- SCREEN 2: EVOLUÇÃO -->
-        <section id="screen-evolution" class="p-6 space-y-6 hidden">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Evolução</h2>
-                <select class="bg-cardLight dark:bg-cardDark border-none text-sm font-medium rounded-lg p-2 outline-none shadow-sm cursor-pointer">
-                    <option>Últimos 6 meses</option>
-                    <option>Último Ano</option>
-                    <option>Tudo</option>
-                </select>
-            </div>
-
-            <!-- Card Gráfico Peso -->
-            <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm transition-colors">
-                <div class="flex justify-between items-end mb-4">
                     <div>
-                        <p class="text-sm text-textSubLight dark:text-textSubDark flex items-center gap-1">
-                            <i class="ph ph-scales text-primary"></i> Peso Corporal (kg)
-                        </p>
-                        <p id="evo-weight" class="text-2xl font-bold">--</p>
+                        <h3 id="val-passos" class="text-2xl font-black text-gray-800">--</h3>
+                        <p class="text-xs text-gray-500 font-medium">Passos dados</p>
                     </div>
                 </div>
-                <div class="relative h-48 w-full">
+
+                <!-- Sono -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 flex flex-col justify-between h-32">
+                    <div class="flex justify-between items-start">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500">
+                            <i class="ph ph-moon-stars text-lg"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-green-500 bg-green-50 px-2 py-1 rounded-full">Hoje</span>
+                    </div>
+                    <div>
+                        <h3 id="val-sono" class="text-2xl font-black text-gray-800">-- h</h3>
+                        <p class="text-xs text-gray-500 font-medium">Horas de sono</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peso Atual -->
+            <div class="bg-gradient-to-r from-primary to-primaryDark rounded-3xl p-6 shadow-lg text-white flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-green-100 font-medium mb-1">Peso Atual</p>
+                    <div class="flex items-end gap-2">
+                        <h3 id="val-peso" class="text-4xl font-black">--</h3>
+                        <span class="text-lg font-medium text-green-100 mb-1">kg</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                    <i class="ph ph-scales text-2xl text-white"></i>
+                </div>
+            </div>
+
+            <!-- CHART SECTION -->
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-800">Evolução do Peso</h3>
+                    <select class="text-xs bg-gray-50 border border-gray-100 text-gray-600 rounded-full px-3 py-1 outline-none">
+                        <option>Última semana</option>
+                    </select>
+                </div>
+                <div class="h-48 w-full relative">
                     <canvas id="weightChart"></canvas>
                 </div>
             </div>
-
-            <!-- Card Gráfico VO2 Max -->
-            <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm transition-colors">
-                <div class="flex justify-between items-end mb-4">
-                    <div>
-                        <p class="text-sm text-textSubLight dark:text-textSubDark flex items-center gap-1">
-                            <i class="ph ph-lungs text-primary"></i> VO2 Max Estimado
-                        </p>
-                        <p class="text-2xl font-bold">48 <span class="text-sm font-normal text-green-500">+2 <i class="ph ph-trend-up"></i></span></p>
-                    </div>
-                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">Excelente</span>
-                </div>
-                <div class="relative h-48 w-full">
-                    <canvas id="vo2Chart"></canvas>
-                </div>
-            </div>
-            
-            <!-- Indicadores Chave -->
-             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm transition-colors">
-                    <p class="text-xs text-textSubLight dark:text-textSubDark mb-1">Ritmo Médio (5k)</p>
-                    <p class="text-lg font-bold">4:50 <span class="text-xs font-normal">/km</span></p>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-2">
-                        <div class="bg-primary h-1.5 rounded-full" style="width: 85%"></div>
-                    </div>
-                    <p class="text-xs text-right mt-1 text-primary">Top 15%</p>
-                </div>
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-2xl shadow-sm transition-colors">
-                    <p class="text-xs text-textSubLight dark:text-textSubDark mb-1">Massa Muscular</p>
-                    <p class="text-lg font-bold">34.2 <span class="text-xs font-normal">kg</span></p>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-2">
-                        <div class="bg-blue-500 h-1.5 rounded-full" style="width: 60%"></div>
-                    </div>
-                    <p class="text-xs text-right mt-1 text-blue-500">Estável</p>
-                </div>
-            </div>
         </section>
 
-        <!-- SCREEN 3: EXAMES -->
-        <section id="screen-exams" class="p-6 space-y-6 hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Meus Exames</h2>
-                <button class="bg-primary text-white p-2 rounded-full shadow-md hover:bg-primaryDark transition-colors">
-                    <i class="ph ph-plus text-xl"></i>
+        <!-- SCREEN 2: EXAMES (Hidden by default) -->
+        <section id="screen-exames" class="p-6 space-y-6 hidden screen-enter">
+            <h2 class="text-2xl font-bold">Meus Exames</h2>
+            
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
+                        <i class="ph ph-file-pdf text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Hemograma Completo</h4>
+                        <p class="text-xs text-gray-500">10 de Mai, 2026</p>
+                    </div>
+                </div>
+                <button class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
+                    <i class="ph ph-download-simple"></i>
                 </button>
             </div>
-
-            <!-- Resumo Analítico -->
-            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-md mb-6">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="font-bold text-lg mb-1">Saúde em Dia</h3>
-                        <p class="text-sm text-indigo-100 opacity-90">90% dos seus biomarcadores estão dentro do padrão ideal no último ano.</p>
-                    </div>
-                    <i class="ph ph-shield-check text-4xl opacity-80"></i>
-                </div>
-                <div class="mt-4 flex gap-2">
-                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm">Colesterol: Normal</span>
-                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm">Glicose: Normal</span>
-                </div>
-            </div>
-
-            <!-- Timeline -->
-            <div class="relative pl-3 space-y-6">
-                
-                <!-- Item Timeline (Futuro) -->
-                <div class="timeline-item relative">
-                    <div class="absolute -left-3 top-1 bg-white dark:bg-bgDark p-1 rounded-full z-10">
-                        <div class="w-4 h-4 rounded-full border-2 border-blue-500 bg-blue-100 dark:bg-blue-900"></div>
-                    </div>
-                    <div class="ml-6 bg-cardLight dark:bg-cardDark p-4 rounded-xl shadow-sm border border-blue-100 dark:border-blue-900/50">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-bold text-blue-500 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded uppercase">Agendado</span>
-                            <span class="text-xs text-textSubLight dark:text-textSubDark font-medium">15 Mai 2026</span>
-                        </div>
-                        <h4 class="font-bold text-md">Hemograma Completo</h4>
-                        <p class="text-sm text-textSubLight dark:text-textSubDark mb-3">Laboratório Fleury - Unidade Centro</p>
-                        <div class="flex gap-2">
-                            <button class="text-xs font-medium px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg w-full text-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Reagendar</button>
-                            <button class="text-xs font-medium px-3 py-1.5 bg-blue-500 text-white rounded-lg w-full text-center hover:bg-blue-600 transition-colors">Preparo</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item Timeline (Passado Recente) -->
-                <div class="timeline-item relative">
-                    <div class="absolute -left-3 top-1 bg-white dark:bg-bgDark p-1 rounded-full z-10">
-                        <div class="w-4 h-4 rounded-full border-2 border-primary bg-primary"></div>
-                    </div>
-                    <div class="ml-6 bg-cardLight dark:bg-cardDark p-4 rounded-xl shadow-sm opacity-90">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-bold text-primary bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded uppercase">Concluído</span>
-                            <span class="text-xs text-textSubLight dark:text-textSubDark font-medium">10 Fev 2026</span>
-                        </div>
-                        <h4 class="font-bold text-md">Teste Ergométrico</h4>
-                        <p class="text-sm text-textSubLight dark:text-textSubDark mb-3">Cardiologia Avançada Dr. Silva</p>
-                        
-                        <div class="bg-bgLight dark:bg-bgDark rounded-lg p-3 flex items-center justify-between mt-2">
-                            <div class="flex items-center gap-2 text-sm">
-                                <i class="ph-fill ph-file-pdf text-red-500 text-lg"></i>
-                                <span class="font-medium truncate w-32">laudo_ergo_2026.pdf</span>
-                            </div>
-                            <button class="text-primary hover:text-primaryDark"><i class="ph ph-download-simple text-lg"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item Timeline (Antigo) -->
-                <div class="timeline-item relative">
-                    <div class="absolute -left-3 top-1 bg-white dark:bg-bgDark p-1 rounded-full z-10">
-                        <div class="w-4 h-4 rounded-full border-2 border-gray-400 bg-gray-400"></div>
-                    </div>
-                    <div class="ml-6 bg-cardLight dark:bg-cardDark p-4 rounded-xl shadow-sm opacity-75">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded uppercase">Concluído</span>
-                            <span class="text-xs text-textSubLight dark:text-textSubDark font-medium">12 Nov 2025</span>
-                        </div>
-                        <h4 class="font-bold text-md">Exames de Sangue Rotina</h4>
-                        <p class="text-sm text-textSubLight dark:text-textSubDark mb-3">Vitamina D, Testosterona Livre, TSH</p>
-                        <button class="text-xs text-primary font-medium flex items-center gap-1">Ver Resultados Comparativos <i class="ph ph-arrow-right"></i></button>
-                    </div>
-                </div>
-
-            </div>
         </section>
-
-        <!-- SCREEN 4: INTEGRAÇÕES -->
-        <section id="screen-sync" class="p-6 space-y-6 hidden">
-            <h2 class="text-2xl font-bold mb-6">Fontes de Dados</h2>
-            
-            <p class="text-sm text-textSubLight dark:text-textSubDark mb-4">
-                Conecte seus aplicativos e dispositivos para centralizar suas informações de saúde e atividades físicas em um único lugar.
-            </p>
-
-            <div class="space-y-4">
-                <!-- Strava -->
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-xl shadow-sm flex items-center justify-between border-l-4 border-[#FC4C02]">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                            <svg class="w-6 h-6 text-[#FC4C02]" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="font-bold">Strava</h4>
-                            <p class="text-xs text-green-500 font-medium flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> Sincronizado agora</p>
-                        </div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                    </label>
-                </div>
-
-                <!-- Apple Health -->
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-xl shadow-sm flex items-center justify-between border-l-4 border-red-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center p-1">
-                            <i class="ph-fill ph-heart text-red-500 text-2xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold">Apple Health</h4>
-                            <p class="text-xs text-green-500 font-medium flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> Sincronizado hoje, 08:00</p>
-                        </div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                    </label>
-                </div>
-
-                <!-- Garmin Connect -->
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-xl shadow-sm flex items-center justify-between border-l-4 border-blue-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="ph-fill ph-watch text-blue-500 text-2xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold">Garmin</h4>
-                            <p class="text-xs text-textSubLight dark:text-textSubDark font-medium">Não conectado</p>
-                        </div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                    </label>
-                </div>
-
-                <!-- Lab Exams (Fleury/Dasa) -->
-                <div class="bg-cardLight dark:bg-cardDark p-4 rounded-xl shadow-sm flex items-center justify-between border-l-4 border-purple-500 mt-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                            <i class="ph-fill ph-microscope text-purple-500 text-2xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold">Laboratórios</h4>
-                            <p class="text-xs text-textSubLight dark:text-textSubDark font-medium">Conecte para importar PDFs</p>
-                        </div>
-                    </div>
-                    <button class="text-sm font-medium bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                        Conectar
-                    </button>
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <!-- Bottom Navigation -->
-    <nav class="bg-cardLight dark:bg-cardDark border-t border-gray-200 dark:border-gray-800 fixed bottom-0 w-full flex justify-around items-center pb-safe pt-2 px-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-300 z-50 h-16">
-        <button onclick="switchScreen('dashboard')" id="nav-dashboard" class="nav-item active flex flex-col items-center justify-center w-full text-textSubLight dark:text-textSubDark hover:text-primary transition-colors">
-            <i class="ph ph-squares-four text-2xl mb-1"></i>
-            <span class="text-[10px] font-medium">Hoje</span>
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-100 pb-safe pt-2 px-6 flex justify-around items-center h-20 z-50">
+        <button onclick="switchTab('dashboard')" class="flex flex-col items-center gap-1 text-primary w-16">
+            <i class="ph-fill ph-squares-four text-2xl"></i>
+            <span class="text-[10px] font-medium">Início</span>
         </button>
-        <button onclick="switchScreen('evolution')" id="nav-evolution" class="nav-item flex flex-col items-center justify-center w-full text-textSubLight dark:text-textSubDark hover:text-primary transition-colors">
-            <i class="ph ph-chart-line-up text-2xl mb-1"></i>
-            <span class="text-[10px] font-medium">Evolução</span>
-        </button>
-        <button onclick="switchScreen('exams')" id="nav-exams" class="nav-item flex flex-col items-center justify-center w-full text-textSubLight dark:text-textSubDark hover:text-primary transition-colors">
-            <i class="ph ph-files text-2xl mb-1"></i>
+        <button onclick="switchTab('exames')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors w-16">
+            <i class="ph ph-heartbeat text-2xl"></i>
             <span class="text-[10px] font-medium">Exames</span>
         </button>
-        <button onclick="switchScreen('sync')" id="nav-sync" class="nav-item flex flex-col items-center justify-center w-full text-textSubLight dark:text-textSubDark hover:text-primary transition-colors">
-            <i class="ph ph-arrows-left-right text-2xl mb-1"></i>
-            <span class="text-[10px] font-medium">Sync</span>
+        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors w-16">
+            <i class="ph ph-user text-2xl"></i>
+            <span class="text-[10px] font-medium">Perfil</span>
         </button>
     </nav>
 
-    <!-- Modal de Registro -->
-    <div id="addModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div id="addModalContent" class="bg-cardLight dark:bg-cardDark w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200">
-            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                <h3 class="font-bold text-lg">Novo Registro</h3>
-                <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <i class="ph ph-x text-xl"></i>
+    <!-- MODAL: ADICIONAR DADOS (Oculto por padrão) -->
+    <div id="add-modal" class="fixed inset-0 bg-black/50 z-[100] hidden items-end sm:items-center justify-center backdrop-blur-sm">
+        <div class="bg-white w-full sm:w-96 rounded-t-3xl sm:rounded-3xl p-6 transform transition-transform translate-y-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Registrar Hoje</h3>
+                <button onclick="closeAddModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
+                    <i class="ph ph-x"></i>
                 </button>
             </div>
-            <form id="healthForm" onsubmit="saveHealthData(event)" class="p-6 space-y-4">
+
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-textSubLight dark:text-textSubDark mb-1">Data</label>
-                    <input type="date" id="input-date" required class="w-full bg-bgLight dark:bg-bgDark border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary dark:text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-textSubLight dark:text-textSubDark mb-1">Peso (kg)</label>
-                        <input type="number" step="0.1" id="input-weight" required placeholder="Ex: 75.5" class="w-full bg-bgLight dark:bg-bgDark border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary dark:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-textSubLight dark:text-textSubDark mb-1">Sono (horas)</label>
-                        <input type="number" step="0.1" id="input-sleep" required placeholder="Ex: 7.5" class="w-full bg-bgLight dark:bg-bgDark border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary dark:text-white">
-                    </div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Peso (kg)</label>
+                    <input type="number" id="input-peso" placeholder="Ex: 78.5" step="0.1" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-textSubLight dark:text-textSubDark mb-1">Passos</label>
-                    <input type="number" id="input-steps" required placeholder="Ex: 10000" class="w-full bg-bgLight dark:bg-bgDark border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary dark:text-white">
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Passos</label>
+                    <input type="number" id="input-passos" placeholder="Ex: 10000" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary">
                 </div>
-                <button type="submit" id="btn-save" class="w-full bg-primary text-white font-bold rounded-xl px-4 py-3 mt-2 shadow-md hover:bg-primaryDark transition-colors flex justify-center items-center gap-2">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Horas de Sono</label>
+                    <input type="number" id="input-sono" placeholder="Ex: 7.5" step="0.1" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary">
+                </div>
+                
+                <button onclick="salvarDados()" class="w-full bg-primary text-white font-bold py-3 rounded-xl mt-4 hover:bg-primaryDark transition-colors">
                     Salvar Dados
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURAÇÃO DO BANCO DE DADOS (SUPABASE)
-        // ==========================================
-        
-        // Suas chaves já estão configuradas aqui!
-        const supabaseUrl = 'https://kwwahyzjmbziyanbpobv.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3d2FoeXpqbWJ6aXlhbmJwb2J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjg0ODMsImV4cCI6MjA5Mzg0NDQ4M30.yrnKNBndXV4yp2XSdzeTJAychpDOmlln-I2VNPdB5gw';
-        
-        let supabaseClient;
-        if (supabaseUrl !== 'COLE_A_SUA_PROJECT_URL_AQUI') {
-            supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-            console.log("Conectado ao Supabase com sucesso!");
+        // --- NAVEGAÇÃO DE ABAS ---
+        function switchTab(tabId) {
+            document.getElementById('screen-dashboard').classList.add('hidden');
+            document.getElementById('screen-exames').classList.add('hidden');
+            document.getElementById('screen-' + tabId).classList.remove('hidden');
         }
 
-        // ==========================================
-        // LÓGICA DA INTERFACE DO APLICATIVO
-        // ==========================================
+        // --- LÓGICA DO MODAL ---
+        function openAddModal() {
+            document.getElementById('add-modal').classList.remove('hidden');
+            document.getElementById('add-modal').classList.add('flex');
+        }
 
-        let healthData = [];
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
+            document.getElementById('add-modal').classList.remove('flex');
+        }
 
-        async function fetchHealthData() {
-            if (!supabaseClient) return;
+        // --- LÓGICA DO STRAVA ---
+        const STRAVA_CLIENT_ID = '238732';
+
+        function connectStrava() {
+            // A URL atual do seu aplicativo na Vercel
+            const redirectUri = window.location.origin; 
+            const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=force&scope=activity:read_all`;
             
+            // Redireciona o usuário para a tela oficial do Strava
+            window.location.href = stravaAuthUrl;
+        }
+
+        // Checar se voltou do Strava com o código
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authCode = urlParams.get('code');
+
+            if (authCode) {
+                console.log("Código do Strava recebido!", authCode);
+                
+                // Muda o visual do botão
+                const stravaBtn = document.getElementById('strava-btn');
+                if(stravaBtn) {
+                    stravaBtn.innerText = "Código Recebido!";
+                    stravaBtn.classList.replace('bg-[#FC4C02]', 'bg-green-500');
+                }
+
+                // Limpa a URL do navegador
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+
+        // --- CONFIGURAÇÃO DO SUPABASE ---
+        // ATENÇÃO: COLE SUAS CHAVES DO SUPABASE AQUI EMBAIXO NOVAMENTE!
+        const supabaseUrl = 'COLE_A_SUA_PROJECT_URL_AQUI'; 
+        const supabaseKey = 'COLE_A_SUA_API_KEY_ANON_PUBLIC_AQUI';
+        
+        // Inicializa o cliente do Supabase
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Variável global para guardar o gráfico
+        let meuGrafico; 
+
+        // Função para buscar dados e atualizar a tela
+        async function carregarDados() {
             try {
-                // Puxa os dados ordenados pela data
                 const { data, error } = await supabaseClient
                     .from('health_metrics')
                     .select('*')
-                    .order('data', { ascending: true });
+                    .order('data', { ascending: true }); // Puxa do mais antigo para o mais novo
 
                 if (error) throw error;
 
                 if (data && data.length > 0) {
-                    healthData = data;
-                    updateDashboard(data);
-                    // Atualiza o gráfico se a tela de evolução já tiver sido aberta
-                    if (window.chartsInitialized) {
-                        initCharts(); 
-                    }
+                    // Pega o dado mais recente (o último da lista)
+                    const hoje = data[data.length - 1];
+                    
+                    document.getElementById('val-peso').innerText = hoje.peso;
+                    document.getElementById('val-passos').innerText = hoje.passos.toLocaleString('pt-BR');
+                    document.getElementById('val-sono').innerText = hoje.horas_sono;
+
+                    // Prepara dados para o gráfico
+                    const datas = data.map(item => item.data.split('-')[2] + '/' + item.data.split('-')[1]); // Ex: 10/05
+                    const pesos = data.map(item => item.peso);
+
+                    atualizarGrafico(datas, pesos);
                 }
-            } catch (error) {
-                console.error("Erro ao buscar dados:", error);
+            } catch (err) {
+                console.error("Erro ao puxar dados:", err);
             }
         }
 
-        function updateDashboard(data) {
-            const latest = data[data.length - 1]; // Pega o último dia
-            
-            // Atualiza Dashboard Principal
-            if (latest.horas_sono) document.getElementById('dash-sleep').innerText = `${latest.horas_sono}h`;
-            if (latest.passos) {
-                const passosFormatados = latest.passos >= 1000 ? (latest.passos / 1000).toFixed(1) + 'k' : latest.passos;
-                document.getElementById('dash-steps').innerText = passosFormatados;
+        // Função para salvar novos dados do Modal
+        async function salvarDados() {
+            const peso = document.getElementById('input-peso').value;
+            const passos = document.getElementById('input-passos').value;
+            const sono = document.getElementById('input-sono').value;
+
+            if(!peso || !passos || !sono) {
+                alert("Preencha todos os campos!");
+                return;
             }
-            
-            // Atualiza a aba Evolução (Peso e Variação)
-            if (latest.peso) {
-                let diffHtml = '';
-                if (data.length > 1) {
-                    const previous = data[data.length - 2];
-                    const diff = (latest.peso - previous.peso).toFixed(1);
-                    if (diff < 0) {
-                        diffHtml = `<span class="text-sm font-normal text-green-500">${diff}kg <i class="ph ph-trend-down"></i></span>`;
-                    } else if (diff > 0) {
-                        diffHtml = `<span class="text-sm font-normal text-red-500">+${diff}kg <i class="ph ph-trend-up"></i></span>`;
-                    }
-                }
-                document.getElementById('evo-weight').innerHTML = `${latest.peso} ${diffHtml}`;
-            }
-        }
-
-        // Inicia a busca logo ao carregar a página
-        fetchHealthData();
-
-        // ==========================================
-        // LÓGICA DO MODAL DE REGISTRO
-        // ==========================================
-        function openAddModal() {
-            const modal = document.getElementById('addModal');
-            const modalContent = document.getElementById('addModalContent');
-            
-            // Define a data de hoje como padrão
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('input-date').value = today;
-            
-            modal.classList.remove('hidden');
-            // Pequeno delay para a animação de entrada funcionar
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
-        }
-
-        function closeAddModal() {
-            const modal = document.getElementById('addModal');
-            const modalContent = document.getElementById('addModalContent');
-            
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.getElementById('healthForm').reset();
-            }, 200);
-        }
-
-        async function saveHealthData(event) {
-            event.preventDefault(); // Evita que a página recarregue
-            
-            const btnSave = document.getElementById('btn-save');
-            const originalText = btnSave.innerHTML;
-            btnSave.innerHTML = '<i class="ph ph-spinner animate-spin text-lg"></i> Salvando...';
-            btnSave.disabled = true;
-
-            const newData = {
-                data: document.getElementById('input-date').value,
-                peso: parseFloat(document.getElementById('input-weight').value),
-                passos: parseInt(document.getElementById('input-steps').value),
-                horas_sono: parseFloat(document.getElementById('input-sleep').value)
-            };
 
             try {
-                // Insere os dados no Supabase
+                // Envia para o Supabase
                 const { error } = await supabaseClient
                     .from('health_metrics')
-                    .insert([newData]);
+                    .insert([
+                        { peso: parseFloat(peso), passos: parseInt(passos), horas_sono: parseFloat(sono) }
+                    ]);
 
                 if (error) throw error;
 
                 // Sucesso!
-                closeAddModal();
+                closeAddModal(); // Fecha a janela
+                carregarDados(); // Recarrega os dados novos na tela
                 
-                // Recarrega os dados para atualizar a tela e os gráficos
-                await fetchHealthData();
-                btnSave.innerHTML = originalText;
-                btnSave.disabled = false;
-                
-            } catch (error) {
-                console.error("Erro ao salvar:", error);
-                btnSave.innerHTML = '<i class="ph ph-warning-circle text-lg"></i> Erro ao Salvar';
-                btnSave.classList.replace('bg-primary', 'bg-red-500');
-                
-                // Volta o botão ao normal após 3 segundos
-                setTimeout(() => {
-                    btnSave.innerHTML = originalText;
-                    btnSave.classList.replace('bg-red-500', 'bg-primary');
-                    btnSave.disabled = false;
-                }, 3000);
+                // Limpa os campos
+                document.getElementById('input-peso').value = '';
+                document.getElementById('input-passos').value = '';
+                document.getElementById('input-sono').value = '';
+
+            } catch (err) {
+                console.error("Erro ao salvar:", err);
+                alert("Erro ao salvar dados.");
             }
         }
 
-        function switchScreen(screenName) {
-            document.querySelectorAll('main > section').forEach(section => {
-                section.classList.remove('block', 'screen-enter');
-                section.classList.add('hidden');
-            });
-            document.querySelectorAll('.nav-item').forEach(nav => {
-                nav.classList.remove('active');
-            });
-
-            const targetScreen = document.getElementById(`screen-${screenName}`);
-            if (targetScreen) {
-                targetScreen.classList.remove('hidden');
-                targetScreen.classList.add('block', 'screen-enter');
-            }
-
-            const targetNav = document.getElementById(`nav-${screenName}`);
-            if (targetNav) {
-                targetNav.classList.add('active');
-            }
-
-            if (screenName === 'evolution' && !window.chartsInitialized) {
-                initCharts();
-                window.chartsInitialized = true;
-            }
-        }
-
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const htmlElement = document.documentElement;
-        
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            htmlElement.classList.add('dark');
-        }
-
-        themeToggleBtn.addEventListener('click', () => {
-            htmlElement.classList.toggle('dark');
-            if (window.chartsInitialized) {
-                initCharts(); 
-            }
-        });
-
-        let weightChartInstance = null;
-        let vo2ChartInstance = null;
-
-        function initCharts() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const gridColor = isDark ? '#374151' : '#e5e7eb';
-            const textColor = isDark ? '#9ca3af' : '#6b7280';
-
-            // Mapeia os dados do banco para os eixos X (Datas) e Y (Pesos)
-            const labels = healthData.length > 0 ? healthData.map(item => {
-                const d = new Date(item.data + 'T00:00:00');
-                return `${d.getDate()}/${d.getMonth()+1}`;
-            }) : ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
-
-            const weightValues = healthData.length > 0 ? healthData.map(item => item.peso) : [80.6, 80.2, 79.5, 79.0, 78.8, 78.5];
-
-            const weightCtx = document.getElementById('weightChart').getContext('2d');
-            if (weightChartInstance) weightChartInstance.destroy();
+        // --- GRÁFICO ---
+        function atualizarGrafico(labels, data) {
+            const ctx = document.getElementById('weightChart').getContext('2d');
             
-            weightChartInstance = new Chart(weightCtx, {
+            // Destrói o gráfico antigo se existir, para não sobrepor
+            if(meuGrafico) {
+                meuGrafico.destroy();
+            }
+
+            meuGrafico = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Peso (kg)',
-                        data: weightValues,
+                        data: data,
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 3,
-                        pointBackgroundColor: '#fff',
+                        pointBackgroundColor: '#ffffff',
                         pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
                         pointRadius: 4,
                         fill: true,
                         tension: 0.4
@@ -749,112 +398,21 @@
                     plugins: { legend: { display: false } },
                     scales: {
                         y: { 
-                            min: 75, max: 82,
-                            grid: { color: gridColor, borderDash: [5, 5] },
-                            ticks: { color: textColor }
+                            beginAtZero: false, 
+                            grid: { borderDash: [4, 4], color: '#f3f4f6' },
+                            ticks: { font: { family: 'Inter' }, color: '#9ca3af' }
                         },
                         x: { 
                             grid: { display: false },
-                            ticks: { color: textColor }
-                        }
-                    }
-                }
-            });
-
-            const vo2Ctx = document.getElementById('vo2Chart').getContext('2d');
-            if (vo2ChartInstance) vo2ChartInstance.destroy();
-            
-            vo2ChartInstance = new Chart(vo2Ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                    datasets: [{
-                        label: 'VO2 Max',
-                        data: [46, 46, 47, 47, 48, 48],
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 6,
-                        barPercentage: 0.5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            min: 40, max: 55,
-                            grid: { color: gridColor, borderDash: [5, 5] },
-                            ticks: { color: textColor }
-                        },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { color: textColor }
+                            ticks: { font: { family: 'Inter' }, color: '#9ca3af' }
                         }
                     }
                 }
             });
         }
 
-        const manifest = {
-            "name": "Health Hub",
-            "short_name": "HealthHub",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#111827",
-            "theme_color": "#10b981",
-            "icons": [{
-                "src": "https://api.iconify.design/ph/heartbeat-fill.svg?color=%2310b981&width=192&height=192",
-                "sizes": "192x192",
-                "type": "image/svg+xml"
-            }, {
-                "src": "https://api.iconify.design/ph/heartbeat-fill.svg?color=%2310b981&width=512&height=512",
-                "sizes": "512x512",
-                "type": "image/svg+xml"
-            }]
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-        document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
-
-        const swCode = `
-            self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
-            self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-            self.addEventListener('fetch', (e) => {});
-        `;
-        const swBlob = new Blob([swCode], {type: 'text/javascript'});
-        
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
-        }
-
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const banner = document.getElementById('pwa-banner');
-            if(banner) {
-                banner.classList.remove('hidden');
-                banner.classList.add('flex');
-            }
-        });
-
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        document.getElementById('pwa-banner').classList.add('hidden');
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                if(isIOS) {
-                    alert('Para instalar no iOS (iPhone):\n1. Toque no ícone de "Compartilhar" (quadrado com seta para cima) na barra do Safari.\n2. Role para baixo e selecione "Adicionar à Tela de Início".');
-                } else {
-                    alert('Seu navegador não suporta a instalação automática. Acesse as opções do navegador e clique em "Instalar aplicativo".');
-                }
-            }
-        }
+        // Executa a busca assim que o aplicativo abre
+        carregarDados();
     </script>
 </body>
 </html>
