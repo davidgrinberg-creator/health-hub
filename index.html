@@ -2,392 +2,361 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Health Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David Grinberg - Health Hub</title>
     
-    <!-- PWA / Manifest -->
-    <meta name="theme-color" content="#10b981">
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Health%20Hub%22,%22short_name%22:%22HealthHub%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22#f3f4f6%22,%22theme_color%22:%22#10b981%22,%22icons%22:[{%22src%22:%22https://placehold.co/512x512/10b981/white?text=HH%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Configuração de Cores do Tailwind -->
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#10b981', // Verde Esmeralda
+                        primary: '#10b981',
                         primaryDark: '#059669',
-                        bgLight: '#f9fafb',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        bgDark: '#0f172a',
+                        cardDark: '#1e293b',
+                        textLight: '#f8fafc',
+                        textMuted: '#94a3b8',
+                        strava: '#fc4c02'
                     }
                 }
             }
         }
     </script>
-
-    <!-- Fontes e Ícones -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Chart.js para Gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Supabase JS -->
-    <script src="https://kwwahyzjmbziyanbpobv.supabase.co/rest/v1/"></script>
-
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .screen-enter {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Ocultar barra de rolagem */
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
+        body { background-color: #0f172a; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        .bottom-nav { background-color: rgba(30, 41, 59, 0.9); backdrop-filter: blur(10px); }
+        .nav-item.active { color: #10b981; }
+        .screen-enter { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Esconde telas inativas */
+        .screen { display: none; }
+        .screen.active { display: block; }
     </style>
 </head>
-<body class="text-gray-800 antialiased pb-24">
+<body class="pb-20">
 
     <!-- HEADER -->
-    <header class="bg-white px-6 pt-12 pb-4 rounded-b-[2rem] shadow-sm sticky top-0 z-20">
+    <header class="pt-12 pb-4 px-6 bg-cardDark rounded-b-3xl shadow-lg sticky top-0 z-10">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="https://ui-avatars.com/api/?name=David+Grinberg&background=10b981&color=fff&rounded=true&bold=true" alt="Perfil" class="w-12 h-12 rounded-full shadow-md">
+                <div class="w-12 h-12 bg-gradient-to-tr from-primary to-blue-500 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">
+                    DG
+                </div>
                 <div>
-                    <p class="text-xs text-gray-500 font-medium">Bom dia,</p>
-                    <h1 class="text-xl font-bold text-gray-900">David Grinberg</h1>
+                    <p class="text-xs text-textMuted font-medium tracking-wider uppercase">Bem-vindo,</p>
+                    <h1 class="text-xl font-bold text-textLight">David Grinberg</h1>
                 </div>
             </div>
-            <button class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
+            <button class="w-10 h-10 bg-bgDark rounded-full flex items-center justify-center text-textLight hover:bg-gray-700 transition">
                 <i class="ph ph-bell text-xl"></i>
             </button>
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main id="app-content">
         <!-- SCREEN 1: DASHBOARD -->
-        <section id="screen-dashboard" class="p-6 space-y-6 block screen-enter">
+        <section id="screen-dashboard" class="screen active p-6 space-y-6 screen-enter">
             
             <!-- Botão Registrar Hoje -->
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-2xl font-bold text-gray-800">Visão Geral</h2>
+                <h2 class="text-2xl font-bold">Visão Geral</h2>
                 <button onclick="openAddModal()" class="bg-primary text-white px-4 py-2 rounded-full shadow-md hover:bg-primaryDark transition-colors font-bold text-sm flex items-center gap-2">
                     <i class="ph ph-plus font-bold text-lg"></i> Registrar
                 </button>
             </div>
 
-            <!-- CARD DE INTEGRAÇÃO STRAVA -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 mb-6 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#FC4C02]/10 flex items-center justify-center text-[#FC4C02]">
-                        <i class="ph ph-activity text-xl font-bold"></i>
+            <!-- Strava Connection Card -->
+            <div class="bg-cardDark rounded-2xl p-5 shadow-lg border border-gray-800 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center text-strava">
+                        <i class="ph-fill ph-activity text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-800">Strava / Garmin</h3>
-                        <p class="text-xs text-gray-500">Sincronizar treinos</p>
+                        <h3 class="font-bold text-lg">Strava</h3>
+                        <p class="text-sm text-textMuted">Sincronize seus treinos</p>
                     </div>
                 </div>
-                <button id="strava-btn" onclick="connectStrava()" class="bg-[#FC4C02] text-white px-4 py-2 rounded-full font-bold text-xs shadow-md transition-colors">
+                <button onclick="connectStrava()" class="bg-strava text-white px-4 py-2 rounded-full text-sm font-bold shadow-md hover:bg-orange-600 transition">
                     Conectar
                 </button>
             </div>
 
-            <!-- KEY METRICS GRID -->
+            <!-- STATS CARDS -->
             <div class="grid grid-cols-2 gap-4">
-                <!-- Passos -->
-                <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 flex flex-col justify-between h-32">
-                    <div class="flex justify-between items-start">
-                        <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
-                            <i class="ph ph-sneaker text-lg"></i>
+                <div class="bg-cardDark p-5 rounded-2xl shadow-lg border border-gray-800 flex flex-col gap-2">
+                    <div class="flex items-center gap-2 text-primary">
+                        <i class="ph-fill ph-steps text-xl"></i>
+                        <span class="font-semibold text-sm">Passos</span>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span id="val-passos" class="text-3xl font-black">--</span>
+                        <span class="text-xs text-textMuted">hoje</span>
+                    </div>
+                </div>
+
+                <div class="bg-cardDark p-5 rounded-2xl shadow-lg border border-gray-800 flex flex-col gap-2">
+                    <div class="flex items-center gap-2 text-blue-400">
+                        <i class="ph-fill ph-moon text-xl"></i>
+                        <span class="font-semibold text-sm">Sono</span>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span id="val-sono" class="text-3xl font-black">--</span>
+                        <span class="text-xs text-textMuted">horas</span>
+                    </div>
+                </div>
+
+                <div class="bg-cardDark p-5 rounded-2xl shadow-lg border border-gray-800 flex flex-col gap-2 col-span-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-orange-400">
+                            <i class="ph-fill ph-scales text-xl"></i>
+                            <span class="font-semibold text-sm">Peso Atual</span>
                         </div>
-                        <span class="text-xs font-semibold text-green-500 bg-green-50 px-2 py-1 rounded-full">Hoje</span>
+                        <span class="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full font-medium">Meta: 75kg</span>
                     </div>
-                    <div>
-                        <h3 id="val-passos" class="text-2xl font-black text-gray-800">--</h3>
-                        <p class="text-xs text-gray-500 font-medium">Passos dados</p>
+                    <div class="flex items-baseline gap-1 mt-2">
+                        <span id="val-peso" class="text-4xl font-black">--</span>
+                        <span class="text-sm text-textMuted">kg</span>
                     </div>
-                </div>
-
-                <!-- Sono -->
-                <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 flex flex-col justify-between h-32">
-                    <div class="flex justify-between items-start">
-                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500">
-                            <i class="ph ph-moon-stars text-lg"></i>
-                        </div>
-                        <span class="text-xs font-semibold text-green-500 bg-green-50 px-2 py-1 rounded-full">Hoje</span>
-                    </div>
-                    <div>
-                        <h3 id="val-sono" class="text-2xl font-black text-gray-800">-- h</h3>
-                        <p class="text-xs text-gray-500 font-medium">Horas de sono</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Peso Atual -->
-            <div class="bg-gradient-to-r from-primary to-primaryDark rounded-3xl p-6 shadow-lg text-white flex justify-between items-center">
-                <div>
-                    <p class="text-sm text-green-100 font-medium mb-1">Peso Atual</p>
-                    <div class="flex items-end gap-2">
-                        <h3 id="val-peso" class="text-4xl font-black">--</h3>
-                        <span class="text-lg font-medium text-green-100 mb-1">kg</span>
-                    </div>
-                </div>
-                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                    <i class="ph ph-scales text-2xl text-white"></i>
-                </div>
-            </div>
-
-            <!-- CHART SECTION -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-gray-800">Evolução do Peso</h3>
-                    <select class="text-xs bg-gray-50 border border-gray-100 text-gray-600 rounded-full px-3 py-1 outline-none">
-                        <option>Última semana</option>
-                    </select>
-                </div>
-                <div class="h-48 w-full relative">
-                    <canvas id="weightChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <!-- SCREEN 2: EXAMES (Hidden by default) -->
-        <section id="screen-exames" class="p-6 space-y-6 hidden screen-enter">
-            <h2 class="text-2xl font-bold">Meus Exames</h2>
-            
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
-                        <i class="ph ph-file-pdf text-2xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-800">Hemograma Completo</h4>
-                        <p class="text-xs text-gray-500">10 de Mai, 2026</p>
-                    </div>
+        <!-- SCREEN 2: EVOLUÇÃO -->
+        <section id="screen-evolution" class="screen p-6 space-y-6">
+            <h2 class="text-2xl font-bold mb-4">Sua Evolução</h2>
+            <div class="bg-cardDark p-4 rounded-2xl shadow-lg border border-gray-800">
+                <h3 class="font-semibold text-textMuted mb-4">Evolução de Peso (Últimos dias)</h3>
+                <div class="relative h-64 w-full">
+                    <canvas id="weightChart"></canvas>
                 </div>
-                <button class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
-                    <i class="ph ph-download-simple"></i>
-                </button>
             </div>
         </section>
     </main>
 
     <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-100 pb-safe pt-2 px-6 flex justify-around items-center h-20 z-50">
-        <button onclick="switchTab('dashboard')" class="flex flex-col items-center gap-1 text-primary w-16">
+    <nav class="bottom-nav fixed bottom-0 w-full border-t border-gray-800 px-6 py-4 flex justify-around items-center z-50">
+        <button onclick="switchTab('dashboard', this)" class="nav-item active flex flex-col items-center gap-1 transition-colors">
             <i class="ph-fill ph-squares-four text-2xl"></i>
-            <span class="text-[10px] font-medium">Início</span>
+            <span class="text-[10px] font-medium">Resumo</span>
         </button>
-        <button onclick="switchTab('exames')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors w-16">
-            <i class="ph ph-heartbeat text-2xl"></i>
+        <button onclick="switchTab('evolution', this)" class="nav-item text-textMuted flex flex-col items-center gap-1 transition-colors hover:text-textLight">
+            <i class="ph ph-trend-up text-2xl"></i>
+            <span class="text-[10px] font-medium">Evolução</span>
+        </button>
+        <button class="nav-item text-textMuted flex flex-col items-center gap-1 transition-colors hover:text-textLight opacity-50 cursor-not-allowed">
+            <i class="ph ph-file-text text-2xl"></i>
             <span class="text-[10px] font-medium">Exames</span>
-        </button>
-        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors w-16">
-            <i class="ph ph-user text-2xl"></i>
-            <span class="text-[10px] font-medium">Perfil</span>
         </button>
     </nav>
 
-    <!-- MODAL: ADICIONAR DADOS (Oculto por padrão) -->
-    <div id="add-modal" class="fixed inset-0 bg-black/50 z-[100] hidden items-end sm:items-center justify-center backdrop-blur-sm">
-        <div class="bg-white w-full sm:w-96 rounded-t-3xl sm:rounded-3xl p-6 transform transition-transform translate-y-0">
+    <!-- MODAL DE ADICIONAR REGISTRO -->
+    <div id="addModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-cardDark w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-gray-800 transform scale-95 transition-transform duration-200" id="addModalContent">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Registrar Hoje</h3>
-                <button onclick="closeAddModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
-                    <i class="ph ph-x"></i>
+                <h3 class="text-xl font-bold">Registro de Hoje</h3>
+                <button onclick="closeAddModal()" class="text-textMuted hover:text-white p-2">
+                    <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
-
-            <div class="space-y-4">
+            
+            <form onsubmit="saveHealthData(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Peso (kg)</label>
-                    <input type="number" id="input-peso" placeholder="Ex: 78.5" step="0.1" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary">
+                    <label class="block text-sm font-medium text-textMuted mb-1">Peso (kg)</label>
+                    <input type="number" step="0.1" id="pesoInput" required class="w-full bg-bgDark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Ex: 78.5">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Passos</label>
-                    <input type="number" id="input-passos" placeholder="Ex: 10000" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary">
+                    <label class="block text-sm font-medium text-textMuted mb-1">Passos</label>
+                    <input type="number" id="passosInput" required class="w-full bg-bgDark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Ex: 10000">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Horas de Sono</label>
-                    <input type="number" id="input-sono" placeholder="Ex: 7.5" step="0.1" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary">
+                    <label class="block text-sm font-medium text-textMuted mb-1">Horas de Sono</label>
+                    <input type="number" step="0.1" id="sonoInput" required class="w-full bg-bgDark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Ex: 7.5">
                 </div>
                 
-                <button onclick="salvarDados()" class="w-full bg-primary text-white font-bold py-3 rounded-xl mt-4 hover:bg-primaryDark transition-colors">
+                <button type="submit" class="w-full bg-primary text-white font-bold rounded-xl px-4 py-3 mt-6 hover:bg-primaryDark transition shadow-lg shadow-primary/30">
                     Salvar Dados
                 </button>
-            </div>
+            </form>
         </div>
     </div>
 
+    <!-- SCRIPTS E LÓGICA -->
     <script>
+     // --- CONFIGURAÇÃO DO SUPABASE ---
+        // ATENÇÃO: COLE SUAS CHAVES DO SUPABASE AQUI EMBAIXO NOVAMENTE!
+        const supabaseUrl = 'https://kwwahyzjmbziyanbpobv.supabase.co/rest/v1/'; 
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3d2FoeXpqbWJ6aXlhbmJwb2J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjg0ODMsImV4cCI6MjA5Mzg0NDQ4M30.yrnKNBndXV4yp2XSdzeTJAychpDOmlln-I2VNPdB5gw';
+
+        
+        let supabaseClient;
+        if(supabaseUrl && supabaseUrl.startsWith('https://')) {
+            const { createClient } = supabase;
+            supabaseClient = createClient(supabaseUrl, supabaseKey);
+        } else {
+            console.warn("Chaves do Supabase não configuradas corretamente.");
+        }
+
+        // Variável global do gráfico
+        let evolutionChart;
+
         // --- NAVEGAÇÃO DE ABAS ---
-        function switchTab(tabId) {
-            document.getElementById('screen-dashboard').classList.add('hidden');
-            document.getElementById('screen-exames').classList.add('hidden');
-            document.getElementById('screen-' + tabId).classList.remove('hidden');
+        function switchTab(tabId, clickedBtn) {
+            document.querySelectorAll('.screen').forEach(el => {
+                el.classList.remove('active');
+                el.classList.remove('screen-enter');
+            });
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-textMuted');
+                const icon = btn.querySelector('i');
+                if(icon) icon.className = icon.className.replace('ph-fill', 'ph');
+            });
+
+            const activeScreen = document.getElementById(`screen-${tabId}`);
+            activeScreen.classList.add('active');
+            setTimeout(() => activeScreen.classList.add('screen-enter'), 10);
+            
+            clickedBtn.classList.add('active');
+            clickedBtn.classList.remove('text-textMuted');
+            const clickedIcon = clickedBtn.querySelector('i');
+            if(clickedIcon) clickedIcon.className = clickedIcon.className.replace('ph ', 'ph-fill ');
+            
+            if(tabId === 'evolution') renderChart();
         }
 
         // --- LÓGICA DO MODAL ---
         function openAddModal() {
-            document.getElementById('add-modal').classList.remove('hidden');
-            document.getElementById('add-modal').classList.add('flex');
+            const modal = document.getElementById('addModal');
+            const content = document.getElementById('addModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => content.classList.replace('scale-95', 'scale-100'), 10);
         }
 
         function closeAddModal() {
-            document.getElementById('add-modal').classList.add('hidden');
-            document.getElementById('add-modal').classList.remove('flex');
+            const modal = document.getElementById('addModal');
+            const content = document.getElementById('addModalContent');
+            content.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('pesoInput').value = '';
+                document.getElementById('passosInput').value = '';
+                document.getElementById('sonoInput').value = '';
+            }, 200);
         }
 
-        // --- LÓGICA DO STRAVA ---
-        const STRAVA_CLIENT_ID = '238732';
-
-        function connectStrava() {
-            // A URL atual do seu aplicativo na Vercel
-            const redirectUri = window.location.origin; 
-            const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=force&scope=activity:read_all`;
+        // --- LÓGICA DE SALVAR DADOS NO SUPABASE ---
+        async function saveHealthData(event) {
+            event.preventDefault(); // Evita recarregar a página
             
-            // Redireciona o usuário para a tela oficial do Strava
-            window.location.href = stravaAuthUrl;
-        }
-
-        // Checar se voltou do Strava com o código
-        window.addEventListener('load', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const authCode = urlParams.get('code');
-
-            if (authCode) {
-                console.log("Código do Strava recebido!", authCode);
-                
-                // Muda o visual do botão
-                const stravaBtn = document.getElementById('strava-btn');
-                if(stravaBtn) {
-                    stravaBtn.innerText = "Código Recebido!";
-                    stravaBtn.classList.replace('bg-[#FC4C02]', 'bg-green-500');
-                }
-
-                // Limpa a URL do navegador
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        });
-
-
-        // --- CONFIGURAÇÃO DO SUPABASE ---
-        // ATENÇÃO: COLE SUAS CHAVES DO SUPABASE AQUI EMBAIXO NOVAMENTE!
-        const supabaseUrl = 'https://kwwahyzjmbziyanbpobv.supabase.co/rest/v1/'; 
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3d2FoeXpqbWJ6aXlhbmJwb2J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjg0ODMsImV4cCI6MjA5Mzg0NDQ4M30.yrnKNBndXV4yp2XSdzeTJAychpDOmlln-I2VNPdB5gw';
-        
-        // Inicializa o cliente do Supabase
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // Variável global para guardar o gráfico
-        let meuGrafico; 
-
-        // Função para buscar dados e atualizar a tela
-        async function carregarDados() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('health_metrics')
-                    .select('*')
-                    .order('data', { ascending: true }); // Puxa do mais antigo para o mais novo
-
-                if (error) throw error;
-
-                if (data && data.length > 0) {
-                    // Pega o dado mais recente (o último da lista)
-                    const hoje = data[data.length - 1];
-                    
-                    document.getElementById('val-peso').innerText = hoje.peso;
-                    document.getElementById('val-passos').innerText = hoje.passos.toLocaleString('pt-BR');
-                    document.getElementById('val-sono').innerText = hoje.horas_sono;
-
-                    // Prepara dados para o gráfico
-                    const datas = data.map(item => item.data.split('-')[2] + '/' + item.data.split('-')[1]); // Ex: 10/05
-                    const pesos = data.map(item => item.peso);
-
-                    atualizarGrafico(datas, pesos);
-                }
-            } catch (err) {
-                console.error("Erro ao puxar dados:", err);
-            }
-        }
-
-        // Função para salvar novos dados do Modal
-        async function salvarDados() {
-            const peso = document.getElementById('input-peso').value;
-            const passos = document.getElementById('input-passos').value;
-            const sono = document.getElementById('input-sono').value;
-
-            if(!peso || !passos || !sono) {
-                alert("Preencha todos os campos!");
+            if(!supabaseClient) {
+                alert("O Supabase não está conectado. Verifique suas chaves no código.");
                 return;
             }
 
-            try {
-                // Envia para o Supabase
-                const { error } = await supabaseClient
-                    .from('health_metrics')
-                    .insert([
-                        { peso: parseFloat(peso), passos: parseInt(passos), horas_sono: parseFloat(sono) }
-                    ]);
+            const peso = document.getElementById('pesoInput').value;
+            const sono = document.getElementById('sonoInput').value;
+            const passos = document.getElementById('passosInput').value;
 
-                if (error) throw error;
+            // Envia para o Supabase
+            const { data, error } = await supabaseClient
+                .from('health_metrics')
+                .insert([
+                    { peso: parseFloat(peso), horas_sono: parseFloat(sono), passos: parseInt(passos) }
+                ]);
 
-                // Sucesso!
-                closeAddModal(); // Fecha a janela
-                carregarDados(); // Recarrega os dados novos na tela
-                
-                // Limpa os campos
-                document.getElementById('input-peso').value = '';
-                document.getElementById('input-passos').value = '';
-                document.getElementById('input-sono').value = '';
-
-            } catch (err) {
-                console.error("Erro ao salvar:", err);
-                alert("Erro ao salvar dados.");
+            if (error) {
+                console.error("Erro completo:", error);
+                alert("ERRO AO SALVAR:\n" + error.message + "\n\nVerifique se o comando RLS foi rodado no Supabase!");
+            } else {
+                alert("Dados salvos com sucesso!");
+                closeAddModal();
+                fetchData(); // Recarrega os dados na tela
             }
         }
 
-        // --- GRÁFICO ---
-        function atualizarGrafico(labels, data) {
-            const ctx = document.getElementById('weightChart').getContext('2d');
+        // --- LÓGICA DO STRAVA ---
+        function connectStrava() {
+            const clientId = '238732'; // O ID que você me passou
+            // Pega o endereço exato que o usuário está acessando agora
+            const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
             
-            // Destrói o gráfico antigo se existir, para não sobrepor
-            if(meuGrafico) {
-                meuGrafico.destroy();
+            const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=force&scope=activity:read_all`;
+            
+            window.location.href = stravaAuthUrl;
+        }
+
+        // --- BUSCAR DADOS DO SUPABASE E ATUALIZAR TELA ---
+        async function fetchData() {
+            if(!supabaseClient) return;
+
+            const { data, error } = await supabaseClient
+                .from('health_metrics')
+                .select('*')
+                .order('data', { ascending: true });
+
+            if (error) {
+                console.error("Erro ao buscar dados:", error);
+                return;
             }
 
-            meuGrafico = new Chart(ctx, {
+            if (data && data.length > 0) {
+                // Pegar o último registro (Hoje)
+                const hoje = data[data.length - 1];
+                
+                // Formatar e atualizar tela
+                document.getElementById('val-peso').innerText = hoje.peso ? hoje.peso.toFixed(1) : '--';
+                document.getElementById('val-passos').innerText = hoje.passos ? (hoje.passos/1000).toFixed(1) + 'k' : '--';
+                document.getElementById('val-sono').innerText = hoje.horas_sono ? hoje.horas_sono.toFixed(1) : '--';
+
+                // Guardar globalmente para o gráfico
+                window.healthData = data;
+                
+                // Se estiver na aba evolução, atualiza o gráfico
+                if(document.getElementById('screen-evolution').classList.contains('active')) {
+                    renderChart();
+                }
+            }
+        }
+
+        // --- DESENHAR GRÁFICO COM DADOS DO BANCO ---
+        function renderChart() {
+            const ctx = document.getElementById('weightChart');
+            if(!ctx || !window.healthData) return;
+
+            // Destrói gráfico antigo se existir
+            if(evolutionChart) evolutionChart.destroy();
+
+            // Preparar dados para o gráfico
+            const labels = window.healthData.map(d => {
+                const date = new Date(d.data);
+                return `${date.getDate()}/${date.getMonth()+1}`;
+            });
+            const weights = window.healthData.map(d => d.peso);
+
+            // Criar novo gráfico
+            evolutionChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Peso (kg)',
-                        data: data,
+                        data: weights,
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 3,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#10b981',
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#0f172a',
                         pointBorderWidth: 2,
-                        pointRadius: 4,
+                        pointRadius: 5,
                         fill: true,
                         tension: 0.4
                     }]
@@ -398,21 +367,41 @@
                     plugins: { legend: { display: false } },
                     scales: {
                         y: { 
-                            beginAtZero: false, 
-                            grid: { borderDash: [4, 4], color: '#f3f4f6' },
-                            ticks: { font: { family: 'Inter' }, color: '#9ca3af' }
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8' }
                         },
                         x: { 
                             grid: { display: false },
-                            ticks: { font: { family: 'Inter' }, color: '#9ca3af' }
+                            ticks: { color: '#94a3b8' }
                         }
                     }
                 }
             });
         }
 
-        // Executa a busca assim que o aplicativo abre
-        carregarDados();
+        // --- INICIAR APP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            
+            // Verificar se o usuário acabou de voltar do Strava (tem ?code= na URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                // Altera o botão para mostrar sucesso!
+                const stravaBtn = document.querySelector('button[onclick="connectStrava()"]');
+                if(stravaBtn) {
+                    stravaBtn.className = "bg-primary text-white px-4 py-2 rounded-full text-sm font-bold shadow-md";
+                    stravaBtn.innerHTML = '<i class="ph-fill ph-check-circle mr-1"></i> Conectado';
+                    stravaBtn.onclick = null; // desabilita o clique
+                    
+                    // Limpa a URL para ficar bonita
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    
+                    alert("Código do Strava recebido com sucesso!\nO próximo passo é salvar isso no banco de dados.");
+                }
+            }
+        });
     </script>
 </body>
 </html>
